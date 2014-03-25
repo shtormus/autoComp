@@ -392,8 +392,8 @@ void LcdClear (void)    //Clears the display
         {
         int i;
 	
-	for (i = 0; i < LCD_CACHE_SIZE; i++) LcdCache[i] = 0;	//забиваем всю память 0
-	LcdUpdate ();
+	    for (i = 0; i < LCD_CACHE_SIZE; i++) LcdCache[i] = 0;	//забиваем всю память 0
+	    LcdUpdate ();
         }
 
 void LcdInit ( void )	//инициализация SPI и дисплея
@@ -597,17 +597,34 @@ void CharPrint (int ch, unsigned int IconSize, flash unsigned char *CharData, un
     {
         unsigned char i;
      	
-    for ( i = 0; i < IconSize; i++ )
-    {
-       LcdCache[LcdCacheIdx++] = inv ? ~(CharData[(ch*IconSize+i)]) : CharData[(ch*IconSize+i)];
-    } 
-    if (space) LcdCache[LcdCacheIdx++] = 0x00;	//добавляем пробел между символами
+        for ( i = 0; i < IconSize; i++ )
+        {
+            LcdCache[LcdCacheIdx++] = inv ? ~(CharData[(ch*IconSize+i)]) : CharData[(ch*IconSize+i)];
+        } 
+        if (space) LcdCache[LcdCacheIdx++] = 0x00;	//добавляем пробел между символами
     }
 
 void LcdChr (int ch)	//Displays a character at current cursor location and increment cursor location
  	{
      	CharPrint(ch,5,table,0,1); 
  	}
+
+void LcdStringPrint (unsigned char x, unsigned char y, unsigned int inv)	//Displays a string at current cursor location
+	{
+	    unsigned char i;
+	
+	    if (x > 14 && y > 6) return;
+	    LcdGotoXYFont (x, y);
+	    for ( i = 0; i < 15-x; i++ )
+        { 
+            if (lcd_buf[i]) 
+            {
+                if(inv) CharPrint(lcd_buf[i],6,table,1,1); 
+                else LcdChr (lcd_buf[i]);
+            }
+        }
+	    clean_lcd_buf(); 
+	}
 
 void LcdString (unsigned char x, unsigned char y)	//Displays a string at current cursor location
 	{

@@ -29,6 +29,7 @@ unsigned char ds18b20_devices;
 unsigned char ds18b20_rom_codes[MAX_DS18B20][9];
 unsigned int _arrTemplate[];
 unsigned int _template;
+float _volt;
 
 
 //ASCII
@@ -192,6 +193,11 @@ int tempProcessing(int temperature)
   return temperature;
 }
 
+void readADC(unsigned int adcValue)
+{
+  _volt = adcValue*0.14663; 
+}
+
 void template(unsigned int numTemplate)
 {
     int internalTemperature;
@@ -210,6 +216,16 @@ void template(unsigned int numTemplate)
             LcdStringBold(5,2);
             sprintf (lcd_buf, "%3i\x02", internalTemperature);
             LcdStringBold(5,4);
+            sprintf (lcd_buf, "Thermo");
+	        LcdString(5,6);
+            break;
+        case 1:
+            sprintf (lcd_buf, "%2i.%iV", (int)_volt/10, (int)_volt%10);
+            LcdString(3,3);
+            sprintf (lcd_buf, "Normal");
+            LcdString(5,5);
+            sprintf (lcd_buf, "Voltmeter");
+	        LcdString(3,6);
             break;
     } 
 }
@@ -235,7 +251,8 @@ void warning(void)
   {
     LcdGotoXYFont(9,1);
     iconView(3,0);
-  }  
+  }
+    
 }
 
 void update(void)
@@ -248,19 +265,11 @@ void update(void)
 
 void test ()
 {
-bit inv=0;
-char i;
 
     //getTemperature(ds18b20_devices);
     //setTemplate(0);      
     //inv = !inv;
     //LcdGotoXYFont(6,1);
     //iconView(2,inv);
-    
-    
-    
-       
-    //sprintf (lcd_buf, "%i", -1);
-	//LcdString(3,6);
 }
 

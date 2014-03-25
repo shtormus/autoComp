@@ -38,6 +38,23 @@ Data Stack size         : 256
 
 unsigned int i;
 
+
+#define ADC_VREF_TYPE 0xC0
+
+// Read the AD conversion result
+unsigned int read_adc(unsigned char adc_input)
+{
+ADMUX=adc_input | (ADC_VREF_TYPE & 0xff);
+// Delay needed for the stabilization of the ADC input voltage
+delay_us(10);
+// Start the AD conversion
+ADCSRA|=0x40;
+// Wait for the AD conversion to complete
+while ((ADCSRA & 0x10)==0);
+ADCSRA|=0x10;
+return ADCW;
+}
+
 // External Interrupt 0 service routine
 interrupt [EXT_INT0] void ext_int0_isr(void)
 {
@@ -71,6 +88,7 @@ i++;
     { 
         i = 0;
         getTemperature(ds18b20_devices);
+        readADC(read_adc(1));
     }
 }
 
@@ -79,22 +97,6 @@ interrupt [TIM2_OVF] void timer2_ovf_isr(void)
 {
 // Place your code here
 
-}
-
-#define ADC_VREF_TYPE 0xC0
-
-// Read the AD conversion result
-unsigned int read_adc(unsigned char adc_input)
-{
-ADMUX=adc_input | (ADC_VREF_TYPE & 0xff);
-// Delay needed for the stabilization of the ADC input voltage
-delay_us(10);
-// Start the AD conversion
-ADCSRA|=0x40;
-// Wait for the AD conversion to complete
-while ((ADCSRA & 0x10)==0);
-ADCSRA|=0x10;
-return ADCW;
 }
 
 // Declare your global variables here
@@ -208,8 +210,10 @@ w1_init();
 LcdInit();
 LcdContrast(35);
 tempDeviceInit();
+getTemperature(ds18b20_devices);
+readADC(read_adc(1));
 
-setTemplate(0);
+setTemplate(1);
 // Global enable interrupts
 #asm("sei")
 

@@ -11,7 +11,8 @@ engineTempDevice                                                  0x0373       1
 ds18b20_devices                                                   0x0374       1
 ds18b20_rom_codes                                                 0x0375      72
 _template                                                         0x03BD       2
-i                                                                 0x03BF       2
+_volt                                                             0x03BF       4
+i                                                                 0x03C3       2
 
 EEPROM Allocation
 Variable                                                          Address   Size
